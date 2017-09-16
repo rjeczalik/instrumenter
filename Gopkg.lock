@@ -2,14 +2,20 @@
 
 
 [[projects]]
+  name = "github.com/satori/uuid"
+  packages = ["."]
+  revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/tools"
-  packages = ["cmd/eg","go/ast/astutil","go/buildutil","go/loader","refactor/eg"]
+  packages = ["go/ast/astutil","refactor/eg"]
   revision = "e531a2a1c15f94033f6fa87666caeb19a688175f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "72675d3cf50389e458729a63de34c315ba8dfeb615e95d0ffa55fdce22a933b5"
+  inputs-digest = "0cff7016523d0ae4b1f6fe59fac59c588ec106fb4aa2bc7b317e4386c74adc98"
   solver-name = "gps-cdcl"
   solver-version = 1
