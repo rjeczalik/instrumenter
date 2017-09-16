@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync/atomic"
 
-	_ "golang.org/x/tools/cmd/eg"
+	_ "golang.org/x/tools/refactor/eg"
 )
 
 var interceptor atomic.Value
