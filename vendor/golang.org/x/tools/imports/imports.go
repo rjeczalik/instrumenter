@@ -25,6 +25,14 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+var StdlibPackages = make(map[string]bool)
+
+func init() {
+	for _, pkg := range stdlib {
+		StdlibPackages[pkg] = true
+	}
+}
+
 // Options specifies options for processing files.
 type Options struct {
 	Fragment  bool // Accept fragment of a source file (no package statement)

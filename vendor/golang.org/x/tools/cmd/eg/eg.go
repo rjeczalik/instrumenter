@@ -16,6 +16,7 @@ import (
 
 	"golang.org/x/tools/go/buildutil"
 	"golang.org/x/tools/go/loader"
+	"golang.org/x/tools/imports"
 	"golang.org/x/tools/refactor/eg"
 )
 
@@ -26,6 +27,7 @@ var (
 	transitiveFlag = flag.Bool("transitive", false, "apply refactoring to all dependencies too")
 	writeFlag      = flag.Bool("w", false, "rewrite input files in place (by default, the results are printed to standard output)")
 	verboseFlag    = flag.Bool("v", false, "show verbose matcher diagnostics")
+	nostdlibFlag   = flag.Bool("nostdlib", false, "do not rewrite Go stdlib packages")
 )
 
 func init() {
@@ -40,6 +42,7 @@ Usage: eg -t template.go [-w] [-transitive] <args>...
 -t template.go	 specifies the template file (use -help to see explanation)
 -w          	 causes files to be re-written in place.
 -transitive 	 causes all dependencies to be refactored too.
+-nostdlib   	 causes to not rewrite stdlib packages (if -transitive is in use)
 -v               show verbose matcher diagnostics
 -beforeedit cmd  a command to exec before each file is modified.
                  "{}" represents the name of the file.
@@ -98,7 +101,10 @@ func doMain() error {
 	// Apply it to the input packages.
 	var pkgs []*loader.PackageInfo
 	if *transitiveFlag {
-		for _, info := range iprog.AllPackages {
+		for pkg, info := range iprog.AllPackages {
+			if *nostdlibFlag && imports.StdlibPackages[pkg.Path()] {
+				continue
+			}
 			pkgs = append(pkgs, info)
 		}
 	} else {
