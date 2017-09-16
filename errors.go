@@ -1,7 +1,6 @@
 package instrumenter
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"sync/atomic"
@@ -11,14 +10,14 @@ var interceptor atomic.Value
 
 // Error
 func Error(s string) error {
-	err := errors.New(s)
+	var err error = errorString(s)
 	Intercept(err)
 	return err
 }
 
 // Errorf
 func Errorf(s string, args ...interface{}) error {
-	err := fmt.Errorf(s, args...)
+	var err error = errorString(fmt.Sprintf(s, args...))
 	Intercept(err)
 	return err
 }
@@ -31,6 +30,10 @@ func Register(intercept func(error)) {
 func Intercept(err error) {
 	interceptor.Load().(func(error))(err)
 }
+
+type errorString string
+
+func (e errorString) Error() string { return string(e) }
 
 func defaultInterceptor(err error) {
 	fmt.Fprintln(os.Stderr, "INTERCEPTED:", err)
