@@ -111,7 +111,12 @@ func (itc *interceptor) sortedErrors() []*intercept.Error {
 }
 
 func render(w http.ResponseWriter, errors []*intercept.Error, stacktrace, path bool) {
-	fmt.Fprintln(w, "<code>")
+	w.Header().Set("Content-Type", "text/html")
+
+	fmt.Fprintf(w, "<html><head><title>interceptd (%d)</title><style>code{position:fixed;top:50%%;left:50%%;"+
+		"-webkit-transform:translate(-50%%,-50%%);transform:translate(-50%%,-50%%);}"+
+		"</style></head><body><code>", len(errors))
+
 	tw := tabwriter.NewWriter(w, 2, 0, 2, ' ', 0)
 
 	fmt.Fprint(tw, "ID\tTIME\tUSERNAME\tTYPE\tMESSAGE")
@@ -141,5 +146,5 @@ func render(w http.ResponseWriter, errors []*intercept.Error, stacktrace, path b
 
 	tw.Flush()
 
-	fmt.Fprintln(w, "</code>")
+	fmt.Fprint(w, "</code></body></html>")
 }
