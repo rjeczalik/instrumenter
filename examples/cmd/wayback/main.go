@@ -38,7 +38,7 @@ func wayback(url string, t time.Time) (string, error) {
 	var resp waybackReq
 	err := curl(fmt.Sprintf(api, url, t.Format(layout)), &resp)
 	if err != nil {
-		return "", errors.New("error calling wayback api: " + err.Error())
+		return "", fmt.Errorf("error calling wayback api: %s", err)
 	}
 	snapshot := resp.ArchivedSnapshots.Closest.URL
 	if snapshot == "" {
