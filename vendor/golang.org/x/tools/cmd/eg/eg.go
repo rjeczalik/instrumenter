@@ -27,7 +27,7 @@ var (
 	transitiveFlag = flag.Bool("transitive", false, "apply refactoring to all dependencies too")
 	writeFlag      = flag.Bool("w", false, "rewrite input files in place (by default, the results are printed to standard output)")
 	verboseFlag    = flag.Bool("v", false, "show verbose matcher diagnostics")
-	nostdlibFlag   = flag.Bool("nostdlib", false, "do not rewrite Go stdlib packages")
+	ignoreFlag     = flag.String("ignore", "", "list of packages to ignore (for use with -transitive)")
 )
 
 func init() {
@@ -38,14 +38,14 @@ const usage = `eg: an example-based refactoring tool.
 
 Usage: eg -t template.go [-w] [-transitive] <args>...
 
--help            show detailed help message
--t template.go	 specifies the template file (use -help to see explanation)
--w          	 causes files to be re-written in place.
--transitive 	 causes all dependencies to be refactored too.
--nostdlib   	 causes to not rewrite stdlib packages (if -transitive is in use)
--v               show verbose matcher diagnostics
--beforeedit cmd  a command to exec before each file is modified.
-                 "{}" represents the name of the file.
+-help                  show detailed help message
+-t template.go	       specifies the template file (use -help to see explanation)
+-w          	       causes files to be re-written in place.
+-transitive 	       causes all dependencies to be refactored too.
+-ignore pkg1,pkg2,...  causes to not rewrite the given packages
+-v                     show verbose matcher diagnostics
+-beforeedit cmd        a command to exec before each file is modified.
+                       "{}" represents the name of the file.
 ` + loader.FromArgsUsage
 
 func main() {
@@ -101,11 +101,23 @@ func doMain() error {
 	// Apply it to the input packages.
 	var pkgs []*loader.PackageInfo
 	if *transitiveFlag {
-		for pkg, info := range iprog.AllPackages {
-			if *nostdlibFlag && imports.StdlibPackages[pkg.Path()] {
-				continue
+		var ignored = make(map[string]bool)
+		var ignoreStdlib bool
+		for _, path := range strings.Split(*ignoreFlag, ",") {
+			switch path {
+			case "stdlib":
+				ignoreStdlib = true
+			default:
+				ignored[path] = true
 			}
-			pkgs = append(pkgs, info)
+		}
+		isIgnored := func(path string) bool {
+			return ignored[path] || ignoreStdlib && imports.StdlibPackages[path]
+		}
+		for pkg, info := range iprog.AllPackages {
+			if !isIgnored(pkg.Path()) {
+				pkgs = append(pkgs, info)
+			}
 		}
 	} else {
 		pkgs = iprog.InitialPackages()
