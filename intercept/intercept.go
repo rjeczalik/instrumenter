@@ -1,7 +1,9 @@
 package intercept
 
 import (
+	"os"
 	"os/user"
+	"path/filepath"
 	"reflect"
 	"runtime"
 	"time"
@@ -19,6 +21,7 @@ type Error struct {
 
 func NewError(err error) *Error {
 	e := &Error{
+		Path:       os.Args[0],
 		CreatedAt:  time.Now(),
 		Stacktrace: make([]byte, 4096),
 		Type:       reflect.TypeOf(err).String(),
@@ -27,6 +30,10 @@ func NewError(err error) *Error {
 
 	if u, err := user.Current(); err == nil {
 		e.Username = u.Username
+	}
+
+	if abs, err := filepath.Abs(e.Path); err == nil {
+		e.Path = abs
 	}
 
 	n := runtime.Stack(e.Stacktrace, false)
