@@ -72,7 +72,7 @@ func instrument(src, pkg string) error {
 	path := filepath.Join(src, pkg)
 	for _, template := range templates {
 		egArgs := []string{
-			"-ignore", "stdlib,github.com/rjeczalik/instrumenter",
+			"-ignore", "stdlib,github.com/rjeczalik/instrumenter/cmd,github.com/rjeczalik/instrumenter/vendor",
 			"-transitive",
 			"-w",
 			"-t", template,
