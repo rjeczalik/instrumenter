@@ -1,10 +1,14 @@
 package instrumenter
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"os"
+	"log"
+	"net/http"
 	"sync/atomic"
 
+	"github.com/rjeczalik/instrumenter/intercept"
 	_ "golang.org/x/tools/refactor/eg"
 )
 
@@ -37,8 +41,19 @@ type errorString string
 
 func (e errorString) Error() string { return string(e) }
 
-func defaultInterceptor(err error) {
-	fmt.Fprintln(os.Stderr, "INTERCEPTED:", err)
+func defaultInterceptor(e error) {
+	p, err := json.Marshal(intercept.NewError(e))
+	if err != nil {
+		log.Println("failed to send error:", err)
+		return
+	}
+
+	resp, err := http.Post("http://127.0.0.1:8484/new", "application/json", bytes.NewReader(p))
+	if err != nil {
+		log.Println("failed to send error:", err)
+		return
+	}
+	resp.Body.Close()
 }
 
 func init() {

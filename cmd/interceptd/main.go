@@ -13,7 +13,7 @@ import (
 
 	"github.com/satori/uuid"
 
-	"github.com/rjeczalik/instrumenter/cmd/internal/intercept"
+	"github.com/rjeczalik/instrumenter/intercept"
 )
 
 func die(v ...interface{}) {
