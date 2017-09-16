@@ -31,6 +31,9 @@ func init() {
 	for _, pkg := range stdlib {
 		StdlibPackages[pkg] = true
 	}
+	// hack for missing internal packages:
+	StdlibPackages["net/http/internal"] = true
+	StdlibPackages["internal/poll"] = true
 }
 
 // Options specifies options for processing files.
