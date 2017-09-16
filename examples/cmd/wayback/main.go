@@ -2,23 +2,24 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/rjeczalik/instrumenter"
 )
 
 func curl(url string, v interface{}) error {
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("error getting %s: %s", url, err)
+		return instrumenter.Errorf("error getting %s: %s", url, err)
 	}
 	defer resp.Body.Close()
 	err = json.NewDecoder(resp.Body).Decode(v)
 	if err != nil {
-		return errors.New("invalid json payload: " + err.Error())
+		return instrumenter.Error("invalid json payload: " + err.Error())
 	}
 	return nil
 }
@@ -38,11 +39,11 @@ func wayback(url string, t time.Time) (string, error) {
 	var resp waybackReq
 	err := curl(fmt.Sprintf(api, url, t.Format(layout)), &resp)
 	if err != nil {
-		return "", fmt.Errorf("error calling wayback api: %s", err)
+		return "", instrumenter.Errorf("error calling wayback api: %s", err)
 	}
 	snapshot := resp.ArchivedSnapshots.Closest.URL
 	if snapshot == "" {
-		return "", errors.New("no snapshot found")
+		return "", instrumenter.Error("no snapshot found")
 	}
 	return snapshot, nil
 }
