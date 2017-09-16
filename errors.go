@@ -28,12 +28,12 @@ func Register(intercept func(error)) {
 	interceptor.Store(intercept)
 }
 
-func defaultInterceptor(err error) {
-	fmt.Fprintln(os.Stderr, "INTERCEPTED:", err)
+func Intercept(err error) {
+	interceptor.Load().(func(error))(err)
 }
 
-func intercept(err error) {
-	interceptor.Load().(func(error))(err)
+func defaultInterceptor(err error) {
+	fmt.Fprintln(os.Stderr, "INTERCEPTED:", err)
 }
 
 func init() {
