@@ -12,14 +12,14 @@ var interceptor atomic.Value
 // Error
 func Error(s string) error {
 	err := errors.New(s)
-	intercept(err)
+	Intercept(err)
 	return err
 }
 
 // Errorf
 func Errorf(s string, args ...interface{}) error {
 	err := fmt.Errorf(s, args...)
-	intercept(err)
+	Intercept(err)
 	return err
 }
 
