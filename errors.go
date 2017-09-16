@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"sync/atomic"
+
+	_ "golang.org/x/tools/cmd/eg"
 )
 
 var interceptor atomic.Value
