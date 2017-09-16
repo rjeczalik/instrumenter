@@ -56,6 +56,8 @@ func main() {
 }
 
 func doMain() error {
+	const sep = string(os.PathSeparator)
+
 	flag.Parse()
 	args := flag.Args()
 
@@ -101,26 +103,31 @@ func doMain() error {
 	// Apply it to the input packages.
 	var pkgs []*loader.PackageInfo
 	if *transitiveFlag {
-		var ignored = make(map[string]bool)
+		var ignored []string
 		var ignoreStdlib bool
 		for _, path := range strings.Split(*ignoreFlag, ",") {
 			switch path {
 			case "stdlib":
 				ignoreStdlib = true
 			default:
-				ignored[path] = true
+				if !strings.HasSuffix(path, sep) {
+					path = path + sep
+				}
+				ignored = append(ignored, path)
 			}
 		}
 		isIgnored := func(path string) bool {
-			if ignored[path] {
-				return true
-			}
 			if ignoreStdlib {
 				if imports.StdlibPackages[path] {
 					return true
 				}
 				// workaround for vendored golang_org in $GOROOT
 				if strings.HasPrefix(path, "vendor/golang_org") {
+					return true
+				}
+			}
+			for _, ig := range ignored {
+				if strings.HasPrefix(path, ig) {
 					return true
 				}
 			}
