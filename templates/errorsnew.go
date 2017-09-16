@@ -1,4 +1,4 @@
-package instrumenter
+package templates
 
 import (
 	"errors"
