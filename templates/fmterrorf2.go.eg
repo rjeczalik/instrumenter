@@ -10,6 +10,6 @@ func before(msg string, arg1, arg2 interface{}) error {
 	return fmt.Errorf(msg, arg1, arg2)
 }
 
-func after(msg string, arg interface{}) error {
+func after(msg string, arg1, arg2 interface{}) error {
 	return instrumenter.Errorf(msg, arg1, arg2)
 }
