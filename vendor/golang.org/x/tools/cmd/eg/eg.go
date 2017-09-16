@@ -112,7 +112,19 @@ func doMain() error {
 			}
 		}
 		isIgnored := func(path string) bool {
-			return ignored[path] || ignoreStdlib && imports.StdlibPackages[path]
+			if ignored[path] {
+				return true
+			}
+			if ignoreStdlib {
+				if imports.StdlibPackages[path] {
+					return true
+				}
+				// workaround for vendored golang_org in $GOROOT
+				if strings.HasPrefix(path, "vendor/golang_org") {
+					return true
+				}
+			}
+			return false
 		}
 		for pkg, info := range iprog.AllPackages {
 			if !isIgnored(pkg.Path()) {
