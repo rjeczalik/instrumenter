@@ -13,12 +13,12 @@ import (
 func curl(url string, v interface{}) error {
 	resp, err := http.Get(url)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting %s: %s", url, err)
 	}
 	defer resp.Body.Close()
 	err = json.NewDecoder(resp.Body).Decode(v)
 	if err != nil {
-		return err
+		return errors.New("invalid json payload: " + err.Error())
 	}
 	return nil
 }
