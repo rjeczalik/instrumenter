@@ -42,7 +42,10 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 func defaultInterceptor(e error) {
-	p, err := json.Marshal(intercept.NewError(e))
+	req := &intercept.NewRequest{
+		Error: intercept.NewError(e),
+	}
+	p, err := json.Marshal(req)
 	if err != nil {
 		log.Println("failed to send error:", err)
 		return

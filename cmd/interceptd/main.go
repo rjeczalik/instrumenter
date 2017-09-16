@@ -53,6 +53,7 @@ func (itc *interceptor) New(w http.ResponseWriter, r *http.Request) {
 
 	if req.Error == nil {
 		http.Error(w, "invalid or empty error payload", http.StatusBadRequest)
+		return
 	}
 
 	req.Error.ID = uuid.NewV4().String()
